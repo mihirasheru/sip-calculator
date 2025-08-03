@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIP Calculator - Smart Investment Planning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <h1>💰 SIP Calculator</h1>
+        <span class="nav-subtitle">Smart Investment Planning</span>
+      </div>
+      <div class="nav-controls">
+        <button id="darkModeToggle" class="btn btn-secondary">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Dark</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Progress Indicator -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-step active" data-step="1">
+        <span class="step-number">1</span>
+        <span class="step-label">Setup</span>
+      </div>
+      <div class="progress-step" data-step="2">
+        <span class="step-number">2</span>
+        <span class="step-label">Calculate</span>
+      </div>
+      <div class="progress-step" data-step="3">
+        <span class="step-number">3</span>
+        <span class="step-label">Results</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Step 1: SIP Configuration -->
+    <section id="step1" class="step-section active">
+      <div class="container">
+        <div class="card">
+          <div class="card-header">
+            <h2>Configure Your SIP</h2>
+            <p>Choose your investment strategy and parameters</p>
+          </div>
+          
+          <form id="sipForm" class="sip-form">
+            <div class="form-group">
+              <label for="sipType" class="form-label">
+                SIP Type
+                <span class="tooltip" data-tooltip="Choose between regular fixed amounts, increasing amounts, or flexible monthly investments">ℹ️</span>
+              </label>
+              <select id="sipType" class="form-control" required>
+                <option value="regular">Regular SIP</option>
+                <option value="stepup">Step-up SIP</option>
+                <option value="flexible">Flexible SIP</option>
+              </select>
+            </div>
+
+            <!-- Regular SIP Fields -->
+            <div id="regularFields" class="conditional-fields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="monthlyAmount" class="form-label">
+                    Monthly Investment (₹)
+                    <span class="tooltip" data-tooltip="Amount you want to invest every month">ℹ️</span>
+                  </label>
+                  <input type="number" id="monthlyAmount" class="form-control" min="500" max="1000000" step="100" placeholder="10,000">
+                  <div class="form-error" id="monthlyAmountError"></div>
+                </div>
+                <div class="form-group">
+                  <label for="years" class="form-label">
+                    Investment Period (Years)
+                    <span class="tooltip" data-tooltip="How long you plan to invest">ℹ️</span>
+                  </label>
+                  <input type="number" id="years" class="form-control" min="1" max="50" step="1" placeholder="10">
+                  <div class="form-error" id="yearsError"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="investmentCategory" class="form-label">
+                  Investment Category
+                  <span class="tooltip" data-tooltip="Different categories have different expected returns: Large Cap (10%), Mid Cap (12%), Small Cap (15%)">ℹ️</span>
+                </label>
+                <select id="investmentCategory" class="form-control">
+                  <option value="large">Large Cap Funds (10% expected return)</option>
+                  <option value="mid">Mid Cap Funds (12% expected return)</option>
+                  <option value="small">Small Cap Funds (15% expected return)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Step-up SIP Fields -->
+            <div id="stepupFields" class="conditional-fields hidden">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="stepupMonthlyAmount" class="form-label">Initial Monthly Investment (₹)</label>
+                  <input type="number" id="stepupMonthlyAmount" class="form-control" min="500" max="1000000" step="100" placeholder="10,000">
+                  <div class="form-error" id="stepupMonthlyAmountError"></div>
+                </div>
+                <div class="form-group">
+                  <label for="stepupYears" class="form-label">Investment Period (Years)</label>
+                  <input type="number" id="stepupYears" class="form-control" min="1" max="50" step="1" placeholder="10">
+                  <div class="form-error" id="stepupYearsError"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="stepUpPercent" class="form-label">
+                  Annual Step-up (%)
+                  <span class="tooltip" data-tooltip="Percentage by which you'll increase your investment each year">ℹ️</span>
+                </label>
+                <input type="number" id="stepUpPercent" class="form-control" min="1" max="50" step="1" value="10" placeholder="10">
+                <div class="form-error" id="stepUpPercentError"></div>
+              </div>
+            </div>
+
+            <!-- Flexible SIP Fields -->
+            <div id="flexibleFields" class="conditional-fields hidden">
+              <div class="form-group">
+                <label for="flexibleMonths" class="form-label">
+                  Investment Period (Months)
+                  <span class="tooltip" data-tooltip="Total number of months you want to invest">ℹ️</span>
+                </label>
+                <input type="number" id="flexibleMonths" class="form-control" min="6" max="600" step="1" placeholder="60">
+                <div class="form-error" id="flexibleMonthsError"></div>
+              </div>
+              <div id="flexibleInputsContainer" class="flexible-inputs"></div>
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="advanced-options">
+              <button type="button" class="btn btn-link" id="toggleAdvanced">
+                <span>Advanced Options</span>
+                <span class="toggle-icon">▼</span>
+              </button>
+              <div id="advancedFields" class="advanced-fields hidden">
+                <div class="form-group">
+                  <label for="inflationRate" class="form-label">
+                    Expected Inflation Rate (%)
+                    <span class="tooltip" data-tooltip="Annual inflation rate to adjust your returns">ℹ️</span>
+                  </label>
+                  <input type="number" id="inflationRate" class="form-control" min="0" max="20" step="0.1" value="6" placeholder="6">
+                </div>
+                <div class="form-group">
+                  <label for="goalAmount" class="form-label">
+                    Target Goal Amount (₹)
+                    <span class="tooltip" data-tooltip="Optional: Set a financial goal to see if your SIP will achieve it">ℹ️</span>
+                  </label>
+                  <input type="number" id="goalAmount" class="form-control" min="0" step="10000" placeholder="1,00,00,000">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-large">
+                Calculate SIP
+                <span class="btn-icon">→</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 2: Loading -->
+    <section id="step2" class="step-section hidden">
+      <div class="container">
+        <div class="card text-center">
+          <div class="loading-spinner"></div>
+          <h3>Calculating Your Investment...</h3>
+          <p>Please wait while we crunch the numbers</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Results -->
+    <section id="step3" class="step-section hidden">
+      <div class="container">
+        <!-- Results Summary -->
+        <div class="results-grid">
+          <div class="result-card">
+            <div class="result-icon">💰</div>
+            <div class="result-content">
+              <h3>Total Investment</h3>
+              <p class="result-value" id="totalInvestmentResult">₹0</p>
+            </div>
+          </div>
+          <div class="result-card">
+            <div class="result-icon">📈</div>
+            <div class="result-content">
+              <h3>Expected Returns</h3>
+              <p class="result-value" id="returnsResult">₹0</p>
+            </div>
+          </div>
+          <div class="result-card">
+            <div class="result-icon">🎯</div>
+            <div class="result-content">
+              <h3>Total Value</h3>
+              <p class="result-value" id="totalValueResult">₹0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-container">
+          <div class="chart-card">
+            <h3>Investment Breakdown</h3>
+            <canvas id="pieChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Growth Over Time</h3>
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Detailed Analysis -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Detailed Analysis</h3>
+          </div>
+          <div id="detailedAnalysis" class="analysis-content"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="results-actions">
+          <button class="btn btn-secondary" id="backToForm">
+            ← Modify Calculation
+          </button>
+          <button class="btn btn-primary" id="compareAll">
+            📊 Compare All SIP Types
+          </button>
+          <button class="btn btn-success" id="saveResults">
+            💾 Save Results
+          </button>
+          <button class="btn btn-info" id="exportResults">
+            📄 Export PDF
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section id="comparisonSection" class="step-section hidden">
+      <div class="container">
+        <div class="card">
+          <div class="card-header">
+            <h2>SIP Comparison</h2>
+            <p>Compare different SIP strategies with your parameters</p>
+          </div>
+          <div class="comparison-table-container">
+            <table id="comparisonTable" class="comparison-table">
+              <thead>
+                <tr>
+                  <th>SIP Type</th>
+                  <th>Category/Details</th>
+                  <th>Total Investment</th>
+                  <th>Expected Returns</th>
+                  <th>Total Value</th>
+                  <th>Effective Return Rate</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="comparison-actions">
+            <button class="btn btn-secondary" id="backToResults">← Back to Results</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FAQ Modal -->
+  <div id="faqModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Frequently Asked Questions</h2>
+        <button class="modal-close" id="closeFaq">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="faq-item">
+          <h3>What is a SIP?</h3>
+          <p>A Systematic Investment Plan (SIP) is a method of investing in mutual funds where you invest a fixed amount regularly (monthly/quarterly) instead of a lump sum.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What is Step-up SIP?</h3>
+          <p>Step-up SIP allows you to increase your investment amount annually by a fixed percentage, helping you invest more as your income grows.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What is Flexible SIP?</h3>
+          <p>Flexible SIP lets you invest different amounts each month based on your cash flow, giving you complete control over your investment amounts.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How are returns calculated?</h3>
+          <p>Returns are calculated using compound interest formula. Expected returns: Large Cap (10%), Mid Cap (12%), Small Cap (15%). These are historical averages and not guaranteed.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What about taxes?</h3>
+          <p>This calculator doesn't include tax implications. Equity mutual funds have different tax treatments for short-term vs long-term gains. Consult a tax advisor for detailed planning.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Button -->
+  <button id="helpButton" class="help-button" title="Get Help">
+    <span>?</span>
+  </button>
+
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Disclaimer -->
+  <footer class="disclaimer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> This SIP calculator is for educational and illustrative purposes only. Projections are based on assumed returns and do not guarantee future performance. Mutual fund investments are subject to market risks. Please read all scheme-related documents carefully and consult a certified financial advisor before making investment decisions.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/calculations.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
