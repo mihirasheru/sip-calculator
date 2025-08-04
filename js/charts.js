@@ -411,10 +411,18 @@ function updateChartsTheme(theme) {
     if (!chart) return;
     
     chart.options.plugins.legend.labels.color = textColor;
-    chart.options.scales.x.ticks.color = textColor;
-    chart.options.scales.y.ticks.color = textColor;
-    chart.options.scales.x.grid.color = gridColor;
-    chart.options.scales.y.grid.color = gridColor;
+    
+    // Only update scales if they exist (pie charts don't have scales)
+    if (chart.options.scales) {
+      if (chart.options.scales.x) {
+        chart.options.scales.x.ticks.color = textColor;
+        chart.options.scales.x.grid.color = gridColor;
+      }
+      if (chart.options.scales.y) {
+        chart.options.scales.y.ticks.color = textColor;
+        chart.options.scales.y.grid.color = gridColor;
+      }
+    }
     
     chart.update();
   };
@@ -452,16 +460,16 @@ function resizeChartsForMobile() {
       chart.options.plugins.legend.labels.padding = 15;
       
       if (chart.options.scales) {
-        chart.options.scales.x.ticks.font.size = 10;
-        chart.options.scales.y.ticks.font.size = 10;
+        if (chart.options.scales.x) chart.options.scales.x.ticks.font.size = 10;
+        if (chart.options.scales.y) chart.options.scales.y.ticks.font.size = 10;
       }
     } else {
       chart.options.plugins.legend.labels.font.size = 14;
       chart.options.plugins.legend.labels.padding = 20;
       
       if (chart.options.scales) {
-        chart.options.scales.x.ticks.font.size = 12;
-        chart.options.scales.y.ticks.font.size = 12;
+        if (chart.options.scales.x) chart.options.scales.x.ticks.font.size = 12;
+        if (chart.options.scales.y) chart.options.scales.y.ticks.font.size = 12;
       }
     }
     

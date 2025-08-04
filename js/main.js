@@ -176,23 +176,30 @@ function toggleTheme() {
  * Handle SIP type change
  */
 function handleSIPTypeChange() {
-  const sipType = document.getElementById('sipType').value;
+  const sipTypeElement = document.getElementById('sipType');
+  if (!sipTypeElement) return;
+  
+  const sipType = sipTypeElement.value;
   
   // Hide all conditional fields
-  document.getElementById('regularFields').classList.add('hidden');
-  document.getElementById('stepupFields').classList.add('hidden');
-  document.getElementById('flexibleFields').classList.add('hidden');
+  const regularFields = document.getElementById('regularFields');
+  const stepupFields = document.getElementById('stepupFields');
+  const flexibleFields = document.getElementById('flexibleFields');
+  
+  if (regularFields) regularFields.classList.add('hidden');
+  if (stepupFields) stepupFields.classList.add('hidden');
+  if (flexibleFields) flexibleFields.classList.add('hidden');
   
   // Show relevant fields
   switch (sipType) {
     case 'regular':
-      document.getElementById('regularFields').classList.remove('hidden');
+      if (regularFields) regularFields.classList.remove('hidden');
       break;
     case 'stepup':
-      document.getElementById('stepupFields').classList.remove('hidden');
+      if (stepupFields) stepupFields.classList.remove('hidden');
       break;
     case 'flexible':
-      document.getElementById('flexibleFields').classList.remove('hidden');
+      if (flexibleFields) flexibleFields.classList.remove('hidden');
       break;
   }
   
@@ -503,8 +510,11 @@ function showComparison() {
   displayComparisonTable(comparisonData);
   
   // Show comparison section
-  document.getElementById('comparisonSection').classList.remove('hidden');
-  document.getElementById('step3').classList.add('hidden');
+  const comparisonSection = document.getElementById('comparisonSection');
+  const step3 = document.getElementById('step3');
+  
+  if (comparisonSection) comparisonSection.classList.remove('hidden');
+  if (step3) step3.classList.add('hidden');
   
   // Update progress
   updateProgress(3);
@@ -775,7 +785,7 @@ function loadDraftData() {
     <div class="toast-content">
       <span class="toast-icon">💾</span>
       <span class="toast-message">Found saved draft from ${new Date(draft.savedAt).toLocaleDateString()}. Restore it?</span>
-      <button onclick="restoreDraft()" style="margin-left: 10px; padding: 4px 8px; background: var(--primary-500); color: white; border: none; border-radius: 4px; cursor: pointer;">Restore</button>
+      <button onclick="restoreDraft(event)" style="margin-left: 10px; padding: 4px 8px; background: var(--primary-500); color: white; border: none; border-radius: 4px; cursor: pointer;">Restore</button>
       <button onclick="clearDraft(); this.parentElement.parentElement.parentElement.remove();" style="margin-left: 5px; padding: 4px 8px; background: var(--secondary-500); color: white; border: none; border-radius: 4px; cursor: pointer;">Dismiss</button>
     </div>
   `;
@@ -793,7 +803,7 @@ function loadDraftData() {
 /**
  * Restore draft data
  */
-function restoreDraft() {
+function restoreDraft(event) {
   const draft = loadDraft();
   if (!draft) return;
   
@@ -828,9 +838,11 @@ function restoreDraft() {
   showToast('Draft restored successfully!', 'success');
   
   // Remove the toast
-  const toast = event.target.closest('.toast');
-  if (toast && toast.parentNode) {
-    toast.parentNode.removeChild(toast);
+  if (event && event.target) {
+    const toast = event.target.closest('.toast');
+    if (toast && toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
   }
 }
 
